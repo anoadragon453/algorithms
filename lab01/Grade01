@@ -1,0 +1,33 @@
+#!/bin/bash
+rm -f result
+chmod +x ./Grade01
+chmod +x ./testfiles/sol.exe
+
+corr=0;
+
+for i in `seq 1 10`; do
+    rm -f tempresult1
+    rm -f tempresult2 
+    ./MergeInsertion.exe < ./testfiles/t$i >> tempresult1
+    ./testfiles/sol.exe < ./testfiles/t$i >> tempresult2
+    diff tempresult1 tempresult2 >> tempcnt
+    if [ -s tempcnt ] ; then
+      echo "Incorrect for $i th example.";
+    else
+      echo "  Correct for $i th example.";
+      ((corr=corr+1))
+    fi;
+
+    #echo "==================" >> result
+    echo $(whoami) "test" $i: ${corr}/10 >> result
+    #cat tempresult1 >> result
+    
+done
+
+echo $corr/10;
+
+rm -f tempresult1
+rm -f tempresult2
+rm -f tempcnt
+
+
