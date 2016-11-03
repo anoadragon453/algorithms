@@ -2,95 +2,57 @@
 #include <stdio.h>
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 using namespace std;
 
 #define INPUT_LENGTH 6
 
+char letters[INPUT_LENGTH] = {'A', 'B', 'C', 'D', 'E', 'F'};
+unordered_map<char, string> *map; 
+
 struct Node {
-    int symbol = 0;
+    char symbol = 0;
     int probability = 0;
     Node* leftChild = NULL;
     Node* rightChild = NULL;
 };
 
-void printNodes (Node *node)
+bool isLeaf (Node *node)
 {
-    char letters[INPUT_LENGTH] = {'A', 'B', 'C', 'D', 'E', 'F'};
-    string codes[INPUT_LENGTH];
-
-    // Figure out node codes
-    for (int i = 0; i < INPUT_LENGTH; i++)
-    {
-        cout << node->probability << endl;
-        node = node->rightChild;
-        
-        /*
-        if (something)
-            codes[i]+="1";
-        else
-            codes[i]+="0";
-        */
-    }
-
-    return;
-
-    // Print out nodes and their codes
-    for (int i = 0; i < INPUT_LENGTH; i++)
-    {
-        cout << letters[i] << ":" << codes[i] << endl;
-    }
-
+    return node->leftChild == NULL && node->rightChild == NULL;
 }
 
-void huffman (vector<Node*> *queueOne)
+// Insert correct path to each node into map
+void huffmanTreeAdd(Node* node, string path)
 {
-    // Create second queue
-    vector<Node*> *queueTwo = new vector<Node*>;
-
-    // Move first element from queueOne into queueTwo
-    // So queueTwo isn't NULL initially
-    queueTwo->push_back(queueOne->front()); // Not working
-    queueOne->erase(queueOne->begin());
-
-    // QueueOne is our initial queue
-    // where nodes with the lowest probability,
-    // aka frequency, are given highest priority
-    while (queueOne->size() > 0)
+    if (isLeaf(node))
     {
-        // Get the two nodes with highest priority
-        // (lowest probability)
-        Node *lowest       = queueOne->front();
-        Node *secondLowest = queueTwo->front();
-
-        // Create new Node with these as children,
-        // and probability equal to the sum of the
-        // nodes
-        Node* node = new Node;
-        node->probability = lowest->probability +
-                            secondLowest->probability;
-        node->leftChild   = lowest;
-        node->rightChild  = secondLowest;
-
-        // Remove those two nodes from the array
-        queueOne->erase(queueOne->begin());
-        queueTwo->erase(queueTwo->begin());
-
-        // Add the node back to the queue
-        queueTwo->push_back(node);
-
+        pair<int, string> newPair (node->symbol, path);
+        map->at(node->symbol) = path;
     }
+    else
+    {
+        huffmanTreeAdd(node->leftChild, path + "0");
+        huffmanTreeAdd(node->rightChild, path + "1");
+    }
+}
 
-    // queueTwo is left with just the root node
-    printNodes (queueTwo->front());
+void printNodes (Node *node)
+{
+    // Insert correct codes into map
+    huffmanTreeAdd(node, "");
+    
+    // Print node codes from map
+    for (int i = 0; i < INPUT_LENGTH; i++)
+    {
+        cout << letters[i] << ":" << map->at(letters[i]) << endl;
+    }
 }
 
 // Sort based on count sort
 vector<Node*> *countsort (vector<Node*> *vec, int maxnum)
 {
-    // Create new 2D vector
-    //vector<Node*> *newVec = new vector<Node*>;
-
     // Initialize histogram and holding arrays
     vector<Node*> *B = new vector<Node*> (INPUT_LENGTH, NULL);
     int C[maxnum];
@@ -122,13 +84,53 @@ vector<Node*> *countsort (vector<Node*> *vec, int maxnum)
         C[vec->at(i)->probability] = index;
     }
 
-    // DEBUG: Print out (supposedly) sorted probability
-    for (ulong i = 0; i < vec->size(); i++)
+    return B;
+}
+
+void huffman (vector<Node*> *queueOne)
+{
+    while (queueOne->size() > 1)
     {
-        cout << B->at(i)->probability << endl;
+        // Get the two nodes with highest priority
+        // (lowest probability)
+        Node *lowest       = queueOne->at(0);
+        Node *secondLowest = queueOne->at(1);
+        
+        // Create new Node with these as children,
+        // and probability equal to the sum of the
+        // nodes
+        Node* node = new Node;
+        node->probability = lowest->probability +
+                            secondLowest->probability;
+        node->leftChild   = lowest;
+        node->rightChild  = secondLowest;
+
+        // Remove those two nodes from the array
+        queueOne->erase(queueOne->begin());
+        queueOne->erase(queueOne->begin());
+
+        // Insert the new node in the correct
+        // spot in the queue
+        bool insertAtBack = true;
+        for (ulong i = 0; i < queueOne->size(); i++)
+        {
+            if (node->probability < queueOne->at(i)->probability)
+            {
+                queueOne->insert(queueOne->begin() + i, node);
+                insertAtBack = false;
+                break;
+            }
+        }
+
+        // If we didn't find a spot in the array for it.
+        // Stick it at the end
+        if (insertAtBack)
+            queueOne->push_back(node);
     }
 
-    return B;
+    // Print out the tree starting from
+    // the root node
+    printNodes(queueOne->front());
 }
 
 int main(int argc, char **argv)
@@ -138,6 +140,9 @@ int main(int argc, char **argv)
     int maxnum = 0;
     int num;
 
+    // Create new HashTable
+    map = new unordered_map<char, string>;
+
     // Fill vector with letter frequencies
     vector<Node*> *input = new vector<Node*>;
     for (int i = 0; i < letterAmt; i++)
@@ -146,13 +151,17 @@ int main(int argc, char **argv)
 
         // Setup new node
         Node *node = new Node;
-        node->symbol = i;
+        node->symbol = letters[i];
         node->probability = num;
         node->leftChild = NULL;
         node->rightChild = NULL;
 
         // Insert into vector
         input->push_back(node);
+
+        // Insert blank path into HashMap
+        pair<int, string> newPair (letters[i], "N");
+        map->insert(newPair);
 
         // Check for max probability
         if (num > maxnum)
@@ -161,7 +170,7 @@ int main(int argc, char **argv)
 
     // Sort nodes from lowest to highest probability 
     // and calculate huffman codes
-    huffman(countsort (input, maxnum));
+    huffman(countsort(input, maxnum));
 
     return 0;
 }
