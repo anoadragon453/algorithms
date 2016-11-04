@@ -136,7 +136,6 @@ void huffman (vector<Node*> *queueOne)
 int main(int argc, char **argv)
 {  
     // Read in numbers from file
-    int letterAmt = 6;
     int maxnum = 0;
     int num;
 
@@ -145,7 +144,7 @@ int main(int argc, char **argv)
 
     // Fill vector with letter frequencies
     vector<Node*> *input = new vector<Node*>;
-    for (int i = 0; i < letterAmt; i++)
+    for (int i = 0; i < INPUT_LENGTH; i++)
     {
         cin >> num;
 
