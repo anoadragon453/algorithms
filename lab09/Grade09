@@ -1,0 +1,30 @@
+#!/bin/bash
+
+prog=MST.exe
+max=2
+
+rm -f result
+corr=0
+
+for i in `seq 1 $max`; do
+    rm -f tempresult
+    ./$prog < ./testfiles/t$i >> tempresult
+    diff tempresult ./testfiles/o$i >> tempcnt
+    if [ -s tempcnt ] ; then
+      echo "Incorrect for $i th example."
+    else
+      echo "  Correct for $i th example."
+      ((corr=corr+1))
+    fi;
+
+    #echo "==================" >> result
+    echo $(whoami) "test" $i: ${corr}/$max >> result
+    #cat tempresult1 >> result
+
+done
+
+echo $corr/$max;
+
+rm -f tempresult
+rm -f tempcnt
+
