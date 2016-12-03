@@ -21,13 +21,13 @@ int main(int argc, char **argv)
     Graph graph(numVerts);
 
     // Loop through edges and add each one to graph
+    int vertOneID, vertTwoID;
     for (int i = 0; i < numEdges; i++)
     {
-        int vertOneID, vertTwoID;
         cin >> vertOneID;
         cin >> vertTwoID;
 
-        graph.addEdge(vertOneID, vertTwoID);
+        graph.pushEdge(vertOneID, vertTwoID);
     }
 
     // Print out SCCs

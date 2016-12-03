@@ -6,25 +6,27 @@ using namespace std;
  
 class Graph
 {
-    int V;    // No. of vertices
-    list<int> *adj;    // An array of adjacency lists
-    vector<int> *printVector; // Holds numbers for printing
+    // Given vertex count
+    int V; 
+    
+    // An array of adjacentListsacency lists
+    list<int> *adjacentLists;
+
+    // Holds numbers for printing
+    vector<int> *printVector;
  
-    // Fills Stack with vertices (in increasing order of finishing
-    // times). The top element of stack has the maximum finishing 
-    // time
+    // Fills stack with vertices in ascending order
     void fillOrder(int v, bool visited[], stack<int> &Stack);
  
     // A recursive function to print DFS starting from v
-    void DFSUtil(int v, bool visited[], vector<int> &numVector);
+    void DepthSearch(int v, bool visited[], vector<int> &numVector);
 public:
     Graph(int V);
-    void addEdge(int v, int w);
+    void pushEdge(int v, int w);
  
-    // The main function that finds and prints strongly connected
-    // components
+    // Finds and prints SCCs
     void printSCCs();
  
-    // Function that returns reverse (or transpose) of this graph
-    Graph getTranspose();
+    // Returns transpose
+    Graph transpose();
 };

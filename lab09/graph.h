@@ -1,6 +1,9 @@
+#ifndef GRAPH_H
+#define GRAPH_H
+
 #include <iostream>
 #include <vector>
-#include <unordered_map>
+#include "structs.h"
 
 using namespace std;
  
@@ -24,10 +27,14 @@ class Graph
 
         // Print MST
         void printMST(int root);
+
+        // Get adjacent neighbors to node
+        vector<int> adjacentNodes(node givenNode);
+
+        // Get weight between two nodes
+        int weightBetween(node nodeOne, node nodeTwo);
     private:
         vector<vector<int>> weightVector;
-
-        unordered_map<int, int> visitedNodes;
-
-        void visit(int node);
 };
+
+#endif

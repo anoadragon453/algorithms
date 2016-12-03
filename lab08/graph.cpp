@@ -8,7 +8,7 @@ using namespace std;
 Graph::Graph(int V)
 {
     this->V = V;
-    adj = new list<int>[V];
+    adjacentLists = new list<int>[V];
 
     // Initialize the print vector with V 0's
     // (to be replaced later)
@@ -16,7 +16,7 @@ Graph::Graph(int V)
 }
 
 // A recursive function to print DFS starting from v
-void Graph::DFSUtil(int v, bool visited[], vector<int> &numVector)
+void Graph::DepthSearch(int v, bool visited[], vector<int> &numVector)
 {
     // Mark the current node as visited and print it
     visited[v] = true;
@@ -26,7 +26,7 @@ void Graph::DFSUtil(int v, bool visited[], vector<int> &numVector)
     {
         numVector.push_back(v);
     } else {
-        // Run through nutil we find number that's bigger than 
+        // Run through util we find number that's bigger than 
         // or equal to us, then push before it
         bool gotem = false;
         for (int i = 0; i < numVector.size(); i++)
@@ -42,66 +42,67 @@ void Graph::DFSUtil(int v, bool visited[], vector<int> &numVector)
             numVector.push_back(v);
     }
  
-    // Recur for all the vertices adjacent to this vertex
+    // Recur for all the vertices adjacentListsacent to this vertex
     list<int>::iterator i;
-    for (i = adj[v].begin(); i != adj[v].end(); ++i)
+    for (i = adjacentLists[v].begin(); i != adjacentLists[v].end(); ++i)
         if (!visited[*i])
-            DFSUtil(*i, visited, numVector);
+            DepthSearch(*i, visited, numVector);
 }
  
-Graph Graph::getTranspose()
+Graph Graph::transpose()
 {
     Graph g(V);
+
     for (int v = 0; v < V; v++)
     {
-        // Recur for all the vertices adjacent to this vertex
+        // Recur for all the vertices
         list<int>::iterator i;
-        for(i = adj[v].begin(); i != adj[v].end(); ++i)
+        for(i = adjacentLists[v].begin(); i != adjacentLists[v].end(); ++i)
         {
-            g.adj[*i].push_back(v);
+            g.adjacentLists[*i].push_back(v);
         }
     }
+    
     return g;
 }
  
-void Graph::addEdge(int v, int w)
+void Graph::pushEdge(int v, int w)
 {
-    adj[v].push_back(w); // Add w to v’s list.
+    adjacentLists[v].push_back(w);
 }
  
+// Fills stack with vertices in ascending order
 void Graph::fillOrder(int v, bool visited[], stack<int> &Stack)
 {
     // Mark the current node as visited and print it
     visited[v] = true;
  
-    // Recur for all the vertices adjacent to this vertex
+    // Recur for all the vertices adjacentListsacent to this vertex
     list<int>::iterator i;
-    for(i = adj[v].begin(); i != adj[v].end(); ++i)
+    for(i = adjacentLists[v].begin(); i != adjacentLists[v].end(); ++i)
         if(!visited[*i])
             fillOrder(*i, visited, Stack);
  
-    // All vertices reachable from v are processed by now, push v 
+    // All vertices reachable from v are processed
     Stack.push(v);
 }
  
-// The main function that finds and prints all strongly connected 
-// components
 void Graph::printSCCs()
 {
     stack<int> Stack;
  
-    // Mark all the vertices as not visited (For first DFS)
+    // Mark all the vertices as not visited
     bool *visited = new bool[V];
     for(int i = 0; i < V; i++)
         visited[i] = false;
  
-    // Fill vertices in stack according to their finishing times
+    // Fill vertices in stack according
     for(int i = 0; i < V; i++)
         if(visited[i] == false)
             fillOrder(i, visited, Stack);
  
     // Create a reversed graph
-    Graph g = getTranspose();
+    Graph g = transpose();
  
     // Mark all the vertices as not visited (For second DFS)
     for(int i = 0; i < V; i++)
@@ -115,12 +116,11 @@ void Graph::printSCCs()
         Stack.pop();
 
         vector<int> *numVector = new vector<int>; // Holds numbers for sorting before printing
-         
  
         // Print Strongly connected component of the popped vertex
         if (visited[v] == false)
         {
-            g.DFSUtil(v, visited, *numVector);
+            g.DepthSearch(v, visited, *numVector);
 
             // Grab ints from numVector and insert into printVector
             int minimum = numVector->at(0);

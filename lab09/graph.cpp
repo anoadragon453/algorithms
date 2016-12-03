@@ -1,7 +1,9 @@
+#ifndef GRAPH_CPP
+#define GRAPH_CPP
+
 #include "graph.h"
 #include <list>
 #include <stack>
-#include <unordered_map>
 #include <climits>
 
 using namespace std;
@@ -40,12 +42,32 @@ void Graph::printWeightedGraph()
     }
 }
 
-void Graph::visit(int node)
+// Find adjacentNodes to the givenNode
+vector<int> Graph::adjacentNodes(node givenNode)
 {
-    // "Visit" the node
-    visitedNodes[node] = 0;
+    // Create a new vector<int>
+    vector<int> returnVector;
+
+    // Loop through inner 2D vector at index of givenNode
+    for (int i = 0; i < numVerts; i++)
+    {
+        // For any weights that are higher than zero,
+        // that means we have a connection and to place the node
+        // we are connected to into the vector of node*'s
+        if (weightVector.at(givenNode.nodeID).at(i) > 0)
+            returnVector.push_back(i);
+    }
+
+    return returnVector;
 }
 
+// Return the weight between two nodes
+int Graph::weightBetween(node nodeOne, node nodeTwo)
+{
+    return weightVector.at(nodeOne.nodeID).at(nodeTwo.nodeID);
+}
+
+/*
 void Graph::printMST(int root)
 {
     // Print the MST starting from given root node
@@ -81,17 +103,9 @@ void Graph::printMST(int root)
             }
         }
 
-        // Check to find the lowest weight to connect to one
-        // of the previous nodes
-        
-        cout << lowestWeightedNode << endl;
-
-        // We found a node
-        //
-        visit(root);
-
-        root++;
     }
     
 }
- 
+*/ 
+
+#endif
