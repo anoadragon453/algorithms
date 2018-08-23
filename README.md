@@ -1,2 +1,3 @@
-# Algorithms
-Labs for CSE-100 at UC Merced.
+# THIS REPOSITORY HAS BEEN DELETED
+
+Sorry, you'll just have to complete the exercises yourselves.
